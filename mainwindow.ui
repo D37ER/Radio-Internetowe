@@ -18,9 +18,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLabel" name="lRoom">
+       <widget class="QLabel" name="lRoomName">
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>Najlepszy pokój</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -40,7 +45,7 @@
       <item>
        <widget class="QPushButton" name="bPlay">
         <property name="text">
-         <string>Play/Pause</string>
+         <string>Connect</string>
         </property>
        </widget>
       </item>
@@ -160,11 +165,14 @@
            </item>
            <item>
             <widget class="QSlider" name="hsVolume">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="maximum">
               <number>100</number>
              </property>
              <property name="value">
-              <number>50</number>
+              <number>100</number>
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -193,7 +201,7 @@
               </size>
              </property>
              <property name="value">
-              <number>24</number>
+              <number>0</number>
              </property>
              <property name="textVisible">
               <bool>false</bool>
@@ -250,24 +258,12 @@
           <enum>QLayout::SetDefaultConstraint</enum>
          </property>
          <item>
-          <widget class="QListView" name="listView">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <widget class="QListWidget" name="lwUsers">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>9</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::NoSelection</enum>
            </property>
           </widget>
          </item>
@@ -408,7 +404,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QListView" name="listView_2">
+           <widget class="QListWidget" name="lwSongs">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
               <horstretch>0</horstretch>

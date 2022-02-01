@@ -11,18 +11,31 @@
 #include <QThread>
 #include <QtCore>
 
-class PlayThread : public QThread
+class PlayThread : public QObject
 {
     Q_OBJECT
 public:
-    explicit PlayThread(QObject *parent = nullptr);
+    explicit PlayThread();
     void run();
+    void play(char buffer[]);
     bool pause = false;
     float volume = 1;
 
+private:
+    int sampleRate;
+    int sampleSize;
+    QAudioSink* audio;
+    QAudioFormat format;
+    int bufferSize;
+    int devBufferUnusedSpace;
+    int position;
+    int positionUpdate;
+    float positionToSecondsMultiplayer;
+    bool pauseStatus;
+    QIODevice* dev;
+
 signals:
-    void TimeChanged(float,float);
-    void SongChanged(QString);
+    void TimeChanged(float);
 
 };
 

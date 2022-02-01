@@ -19,6 +19,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     PlayThread *playThread;
+    NetThread *netThread;
+    float songLength = 1;
+    QPushButton *bBestSongs[8];
 
 protected:
     void play();
@@ -30,8 +33,13 @@ private:
     bool muted = false;
 
 public slots:
-    void onTimeChanged(float,float);
-    void onSongChanged(QString);
+    void onTimeChanged(float);
+    void onSongChanged(QString, float);
+    void onRoomChanged(QString);
+    void onSongsListChanged(QVector<QString>);
+    void onUsersListChanged(QVector<QString>);
+    void onMySongsListChanged(QVector<QString>);
+    void onSongsVotesChanged(QHash<QString, int>);
 
 };
 #endif // MAINWINDOW_H
