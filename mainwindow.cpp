@@ -33,7 +33,7 @@ void MainWindow::play()
 
 void MainWindow::onTimeChanged(float time)
 {
-    ui->lTime->setText(QString::number(time));
+    ui->lName->setText(QString::number(time));
 }
 
 MainWindow::~MainWindow()
