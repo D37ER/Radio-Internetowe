@@ -11,10 +11,12 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    netthread.cpp \
     playthread.cpp
 
 HEADERS += \
     mainwindow.h \
+    netthread.h \
     playthread.h
 
 FORMS += \

@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <iostream>
+#include "ui_mainwindow.h"
 #include "playthread.h"
+#include "netthread.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,9 +22,12 @@ public:
 
 protected:
     void play();
+    void hsVolumeChanged(int value);
+    void bMuteClicked();
 
 private:
     Ui::MainWindow *ui;
+    bool muted = false;
 
 public slots:
     void onTimeChanged(float,float);

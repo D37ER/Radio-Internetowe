@@ -1,5 +1,4 @@
 #include "playthread.h"
-#include "ui_mainwindow.h"
 using namespace std;
 
 PlayThread::PlayThread(QObject *parent) : QThread(parent)
@@ -40,22 +39,38 @@ void PlayThread::run()
         bool pauseStatus = false;
         while(!sourceFile.atEnd())
         {
+            //pause
             do
             {
                 QMutex mutex;
                 mutex.lock();
-//                if(pauseStatus != this->pause)
-//                    cout << "pause changed" << this->pause << endl;
                 pauseStatus = this->pause;
                 mutex.unlock();
             }while(pauseStatus);
 
+            //read
             sourceFile.read(buffer, bufferSize);
+
+            //send time
             position++;
             if(position%positionUpdate==0)
                 emit TimeChanged(position*positionToSecondsMultiplayer, lengthInSeconds);
                 //cout << setprecision(3) << position*positionToSecondsMultiplayer << "s /" << lengthInSeconds << "s " << endl;
 
+            //volume change
+            QMutex mutex;
+            mutex.lock();
+            short t;
+            for(int i=0; i<bufferSize;i+=sampleSize)
+            {
+                memcpy(&t, &buffer[i], sampleSize);
+                t *= this->volume;
+                memcpy(&buffer[i], &t, sampleSize);
+            }
+            mutex.unlock();
+
+
+            //send to speaker
             while(audio->bytesFree()-devBufferUnusedSpace < bufferSize);
             dev->write(buffer, bufferSize);
         }

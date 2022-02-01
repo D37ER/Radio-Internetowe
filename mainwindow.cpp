@@ -1,18 +1,12 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include <QAudioSink>
-#include <QAudioSink>
-#include <QFile>
-#include <iostream>
-#include <cmath>
-#include <fstream>
-#include <QThread>
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     connect(ui->bPlay, &QPushButton::clicked, this, &MainWindow::play);
+    connect(ui->hsVolume, &QSlider::valueChanged, this, &MainWindow::hsVolumeChanged);
+    connect(ui->bMute, &QPushButton::clicked, this, &MainWindow::bMuteClicked);
     playThread = new PlayThread(this);
     connect(playThread, SIGNAL(TimeChanged(float,float)), this, SLOT(onTimeChanged(float,float)));
     connect(playThread, SIGNAL(SongChanged(QString)), this, SLOT(onSongChanged(QString)));
@@ -60,5 +54,19 @@ void MainWindow::onSongChanged(QString newTitle)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+void MainWindow::hsVolumeChanged(int value)
+{
+    cout << (float)value/100 << endl;
+    playThread->volume = (muted)? 0 : (float)value/100;
+}
+
+void MainWindow::bMuteClicked()
+{
+    muted = !muted;
+    cout << muted << endl;
+    playThread->volume = (muted)? 0 : (float)ui->hsVolume->value()/100;
 }
 

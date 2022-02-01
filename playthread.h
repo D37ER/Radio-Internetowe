@@ -15,12 +15,10 @@ class PlayThread : public QThread
 {
     Q_OBJECT
 public:
-    explicit PlayThread(QObject *parent = 0);
+    explicit PlayThread(QObject *parent = nullptr);
     void run();
-    bool pause;
-
-private:
-
+    bool pause = false;
+    float volume = 1;
 
 signals:
     void TimeChanged(float,float);
