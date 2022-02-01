@@ -24,7 +24,8 @@ private:
     Ui::MainWindow *ui;
 
 public slots:
-    void onTimeChanged(float);
+    void onTimeChanged(float,float);
+    void onSongChanged(QString);
 
 };
 #endif // MAINWINDOW_H

@@ -21,11 +21,14 @@ void PlayThread::run()
 
     QFile sourceFile;
     {
+        QIODevice* dev = audio->start();
+
+
+
         sourceFile.setFileName("D:/usunMnie/test2.wav");
         sourceFile.open(QIODevice::ReadOnly);
         cout << "File raport: exists "<< sourceFile.exists() << " fileSize "<< sourceFile.size() << endl;
-
-        QIODevice* dev = audio->start();
+        emit SongChanged("D:/usunMnie/test2.wav");
 
         int bufferSize = sampleRate/100;
         int devBufferUnusedSpace = audio->bufferSize()*9/10;
@@ -50,7 +53,7 @@ void PlayThread::run()
             sourceFile.read(buffer, bufferSize);
             position++;
             if(position%positionUpdate==0)
-                emit TimeChanged(position*positionToSecondsMultiplayer);
+                emit TimeChanged(position*positionToSecondsMultiplayer, lengthInSeconds);
                 //cout << setprecision(3) << position*positionToSecondsMultiplayer << "s /" << lengthInSeconds << "s " << endl;
 
             while(audio->bytesFree()-devBufferUnusedSpace < bufferSize);

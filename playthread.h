@@ -23,7 +23,8 @@ private:
 
 
 signals:
-    void TimeChanged(float);
+    void TimeChanged(float,float);
+    void SongChanged(QString);
 
 };
 
