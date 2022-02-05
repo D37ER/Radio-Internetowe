@@ -9,17 +9,20 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    connectwindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    netthread.cpp \
-    playthread.cpp
+    musicplayer.cpp \
+    netthread.cpp
 
 HEADERS += \
+    connectwindow.h \
     mainwindow.h \
-    netthread.h \
-    playthread.h
+    musicplayer.h \
+    netthread.h
 
 FORMS += \
+    connectwindow.ui \
     mainwindow.ui
 
 # Default rules for deployment.

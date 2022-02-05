@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <iostream>
 #include "ui_mainwindow.h"
-#include "playthread.h"
+#include "musicplayer.h"
 #include "netthread.h"
 
 QT_BEGIN_NAMESPACE
@@ -18,19 +18,34 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    PlayThread *playThread;
+    void setPlayThread(MusicPlayer *playThread);
+    void setNetThread(NetThread *netThread);
+    MusicPlayer *playThread;
     NetThread *netThread;
     float songLength = 1;
-    QPushButton *bBestSongs[8];
+    QToolButton *bBestSongs[8];
 
 protected:
     void play();
     void hsVolumeChanged(int value);
     void bMuteClicked();
+    void bBestSong1Clicked();
+    void bBestSong2Clicked();
+    void bBestSong3Clicked();
+    void bBestSong4Clicked();
+    void bBestSong5Clicked();
+    void bBestSong6Clicked();
+    void bBestSong7Clicked();
+    void bBestSong8Clicked();
+    void lwSongsSelectionChanged();
 
 private:
+    void vote(QString songTitle);
+    void refreshVote();
     Ui::MainWindow *ui;
+    QString currentVote = "";
     bool muted = false;
+    QVector<QString> songs;
 
 public slots:
     void onTimeChanged(float);
@@ -39,7 +54,7 @@ public slots:
     void onSongsListChanged(QVector<QString>);
     void onUsersListChanged(QVector<QString>);
     void onMySongsListChanged(QVector<QString>);
-    void onSongsVotesChanged(QHash<QString, int>);
+    void onSongsVotesChanged(QVector<QString>, QVector<int>);
 
 };
 #endif // MAINWINDOW_H

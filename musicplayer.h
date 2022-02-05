@@ -1,5 +1,5 @@
-#ifndef PLAYTHREAD_H
-#define PLAYTHREAD_H
+#ifndef MUSICPLAYER_H
+#define MUSICPLAYER_H
 
 #include <QThread>
 #include <QAudioSink>
@@ -11,27 +11,24 @@
 #include <QThread>
 #include <QtCore>
 
-class PlayThread : public QObject
+class MusicPlayer : public QObject
 {
     Q_OBJECT
 public:
-    explicit PlayThread();
-    void run();
-    void play(char buffer[]);
+    explicit MusicPlayer();
+    void setUp(int sampleRate, int sampleSize, int playBufferSize, float timeUpdateRate, float deviceBufferUsage);
+    void play(char *buffer);
     bool pause = false;
     float volume = 1;
 
 private:
-    int sampleRate;
     int sampleSize;
-    QAudioSink* audio;
-    QAudioFormat format;
-    int bufferSize;
+    int playBufferSize;
     int devBufferUnusedSpace;
-    int position;
-    int positionUpdate;
+    int timeUpdateDistance;
     float positionToSecondsMultiplayer;
-    bool pauseStatus;
+    int position;
+    QAudioSink* audio;
     QIODevice* dev;
 
 signals:
@@ -39,4 +36,4 @@ signals:
 
 };
 
-#endif // PLAYTHREAD_H
+#endif // MUSICPLAYER_H
