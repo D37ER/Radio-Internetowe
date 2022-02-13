@@ -9,20 +9,37 @@ ConnectWindow::ConnectWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::C
 
 void ConnectWindow::connectToServer()
 {
+    ui->lStatus->setStyleSheet("QLabel {color : black; }");
     ui->lStatus->setText("connecting...");
-    MusicPlayer *playThread = new MusicPlayer();
-    NetThread *netThread = new NetThread(this);
+    playThread = new MusicPlayer();
+    netThread = new NetThread(this);
     netThread->setMusicPlayer(playThread);
-    netThread->start();
-    MainWindow *mw = new MainWindow(this);
+    mw = new MainWindow(nullptr);
     mw->setPlayThread(playThread);
     mw->setNetThread(netThread);
+    connect(netThread, &NetThread::ConnectionStateChanged, this, &ConnectWindow::changeStatus);
+    connect(netThread, &NetThread::RoomChanged, this, &ConnectWindow::changeToMainWindow);
+    connect(netThread, &NetThread::Error, this, &ConnectWindow::showError);
     netThread->connectToServer(ui->leServerAdress->text(), ui->leServerPort->text(), ui->leUserName->text());
-    ui->lStatus->setText("connected");
+}
 
-    //change window
+void ConnectWindow::changeToMainWindow()
+{
+    netThread->start();
     mw->show();
     this->hide();
+}
+
+void ConnectWindow::changeStatus(QString status)
+{
+    ui->lStatus->setStyleSheet("QLabel {color : black; }");
+    ui->lStatus->setText(status);
+}
+
+void ConnectWindow::showError(int number, QString msg)
+{
+    ui->lStatus->setStyleSheet("QLabel {color : red; }");
+    ui->lStatus->setText("error " + QString::number(number) + " : " + msg);
 }
 
 ConnectWindow::~ConnectWindow()

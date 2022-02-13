@@ -3,115 +3,16 @@ using namespace std;
 
 NetThread::NetThread(QObject *parent): QThread{parent}
 {
+    inputBufferSize = 0;
+    currentInputType = '\0';
+    tcpSocket = new QTcpSocket(this);
+    connect(tcpSocket, &QTcpSocket::connected, this, &NetThread::socketConnected);
+    connect(tcpSocket, &QTcpSocket::disconnected, this, &NetThread::socketDisconnected);
+    connect(tcpSocket, &QTcpSocket::readyRead, this, &NetThread::tcpDataReceived);
+    connect(tcpSocket, &QTcpSocket::errorOccurred, this, &NetThread::errorOccurred);
 
-}
-
-void NetThread::connectToServer(QString serverName, QString serverPort, QString userName)
-{
-    //delay
-    QTime dieTime= QTime::currentTime().addSecs(2);
-    while (QTime::currentTime() < dieTime)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-
-
-    this->roomName = serverName;
-    this->connected = true;
-
-    QString znaki[18] = {"0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h"};
-
-    for(int i=0;i<15;i++)
-        this->songs.append("Long song name "+ znaki[i]);
-    emit SongsListChanged(this->songs);
-
-    QVector<QString> users;
-    for(int i=0;i<15;i++)
-        users.append("long user name "+ znaki[i]);
-    emit UsersListChanged(users);
-
-
-    this->votes.clear();
-    for(int i=0;i<this->songs.size();i++)
-        this->votes.append(QRandomGenerator::global()->bounded(11));
-
-    int tempVotes, maxVotesId;
-    QString tempSongName;
-    for(int i=0; i<songs.size();i++)
-    {
-        maxVotesId=i;
-        for(int j=i+1; j<songs.size();j++)
-        {
-            if(votes[j] > votes[maxVotesId])
-                maxVotesId = j;
-            else if(votes[j] == votes[maxVotesId])
-            {
-                int k=0;
-                while(k <songs[j].size() && k <songs[maxVotesId].size() && songs[j][k] == songs[maxVotesId][k] )k++;
-                if(k == songs[maxVotesId].size())
-                    ;
-                else if(k == songs[j].size())
-                    maxVotesId = j;
-                else if(songs[j][k] < songs[maxVotesId][k])
-                    maxVotesId = j;
-            }
-        }
-        if(i!=maxVotesId)
-        {
-            tempVotes = votes[i];
-            tempSongName = songs[i];
-            votes[i] = votes[maxVotesId];
-            songs[i] = songs[maxVotesId];
-            votes[maxVotesId] = tempVotes;
-            songs[maxVotesId] = tempSongName;
-        }
-    }
-
-    emit SongsVotesChanged(this->songs, this->votes);
-}
-
-void NetThread::changeVote(QString newSongTitle)
-{
-    cout << "changeVote " << newSongTitle.toStdString() << endl;
-    int t = songs.indexOf(currentVote);
-    if(t != -1)
-        votes[t]--;
-    currentVote = newSongTitle;
-    t = songs.indexOf(newSongTitle);
-    if(t != -1)
-        votes[t]++;
-
-    int tempVotes, maxVotesId;
-    QString tempSongName;
-    for(int i=0; i<songs.size();i++)
-    {
-        maxVotesId=i;
-        for(int j=i+1; j<songs.size();j++)
-        {
-            if(votes[j] > votes[maxVotesId])
-                maxVotesId = j;
-            else if(votes[j] == votes[maxVotesId])
-            {
-                int k=0;
-                while(k <songs[j].size() && k <songs[maxVotesId].size() && songs[j][k] == songs[maxVotesId][k] )k++;
-                if(k == songs[maxVotesId].size())
-                    ;
-                else if(k == songs[j].size())
-                    maxVotesId = j;
-                else if(songs[j][k] < songs[maxVotesId][k])
-                    maxVotesId = j;
-            }
-        }
-        if(i!=maxVotesId)
-        {
-            tempVotes = votes[i];
-            tempSongName = songs[i];
-            votes[i] = votes[maxVotesId];
-            songs[i] = songs[maxVotesId];
-            votes[maxVotesId] = tempVotes;
-            songs[maxVotesId] = tempSongName;
-        }
-    }
-
-    emit SongsVotesChanged(songs, votes);
+    udpSocket = new QUdpSocket(this);
+    connect(udpSocket, &QUdpSocket::readyRead, this, &NetThread::udpDataReceived);
 }
 
 void NetThread::setMusicPlayer(MusicPlayer *musicPlayer)
@@ -119,21 +20,187 @@ void NetThread::setMusicPlayer(MusicPlayer *musicPlayer)
     this->musicPlayer = musicPlayer;
 }
 
+//SOCKET SLOTS
+void NetThread::socketConnected()
+{
+    udpSocket->bind(QHostAddress::Any, tcpSocket->localPort());
+    musicPlayer->setUp(48000, 2, 4096, 0.1f, 0.8f);
+    emit ConnectionStateChanged("connected");
+    connTimeoutTimer->stop();
+    connTimeoutTimer->deleteLater();
+    QByteArray baUserName = this->userName.toLocal8Bit();
+    tcpSocket->write(baUserName.data());
+    tcpSocket->write("\n");
+}
+
+void NetThread::socketDisconnected()
+{
+    //TODO show info
+    tcpSocket->deleteLater();
+}
+
+void NetThread::toStrVec(QVector<QString> *out, QByteArray *data, int begin, int end, char delimeter)
+{
+    int strStart = 0;
+    for(int i=begin; i<=end; i++)
+        if(data->at(i) == delimeter || i == end)
+        {
+            out->append(QString(data->mid(strStart, i-strStart)));
+            strStart = i+1;
+        }
+}
+
+void NetThread::toVotes(QVector<QString> *songs, QVector<uint> *votes, QByteArray *data, int begin, int end, char delimeter)
+{
+    int recordStart = 0;
+    uint t;
+    for(int i=begin; i<=end; i++)
+        if(data->at(i) == delimeter || i == end)
+        {
+            if(i-recordStart < 5)
+            {
+                recordStart = i+1;
+                continue;
+            }
+            t=0;
+            t+= ((int)data->at(recordStart++));
+            t+= ((int)data->at(recordStart++))*256;
+            t+= ((int)data->at(recordStart++))*65536;
+            t+= ((int)data->at(recordStart++))*16777216;
+            votes->append(t);
+            songs->append(QString(data->mid(recordStart, i-recordStart)));
+            recordStart = i+1;
+        }
+}
+
+void NetThread::tcpDataReceived()
+{
+    cout << "dataReceived " << tcpSocket->bytesAvailable() << endl;
+    if(tcpSocket->bytesAvailable() <1)
+        return;
+
+    if(currentInputType == '\0')
+        currentInputType = tcpSocket->read(1).at(0);
+
+    inputBuffer.append(tcpSocket->readAll());
+    cout << (QString(inputBuffer)).toStdString() << endl;
+    for(; inputBufferSize<inputBuffer.size(); inputBufferSize++)
+    {
+        cout << "adding buffer " << endl;
+        if(inputBuffer.at(inputBufferSize) == '\n')
+        {
+            cout << "enter " << endl;
+            switch(currentInputType)
+            {
+            case 'a':
+                emit ConnectionStateChanged("server name received");
+                emit RoomChanged(QString(inputBuffer.mid(0, inputBufferSize)));
+                break;
+            case 'b':
+            {
+                QVector<QString> songs;
+                toStrVec(&songs, &inputBuffer, 0, inputBufferSize, '\0');
+                emit SongsListChanged(songs);
+                break;
+            }
+            case 'c':
+            {
+                QVector<QString> mySongs;
+                toStrVec(&mySongs, &inputBuffer, 0, inputBufferSize, '\0');
+                emit MySongsListChanged(mySongs);
+                break;
+            }
+            case 'd':
+            {
+                QVector<QString> users;
+                toStrVec(&users, &inputBuffer, 0, inputBufferSize, '\0');
+                emit UsersListChanged(users);
+                break;
+            }
+            case 'e':
+            {
+                QVector<QString> songs;
+                QVector<uint> votes;
+                toVotes(&songs, &votes, &inputBuffer, 0, inputBufferSize, '\0');
+                emit SongsVotesChanged(songs, votes);
+                break;
+            }
+            case 'f':
+            {
+                float length=0;
+                memcpy(&length, inputBuffer, sizeof(length));
+                emit SongChanged(QString(inputBuffer.mid(sizeof(length), inputBufferSize-sizeof(length))), length);
+                break;
+            }
+            default:
+                emit Error(3, "unrecognized data type");
+            }
+
+            if(inputBufferSize+1 < inputBuffer.size())
+            {
+                currentInputType = inputBuffer.at(inputBufferSize+1);
+                inputBuffer.remove(0,inputBufferSize+2);
+            }
+            else
+            {
+                currentInputType = '\0';
+                inputBuffer.remove(0,inputBufferSize+1);
+            }
+            inputBufferSize = 0;
+        }
+    }
+}
+
+void NetThread::udpDataReceived()
+{
+    QByteArray ba;
+    while(udpSocket->hasPendingDatagrams())
+    {
+        ba = udpSocket->receiveDatagram().data();
+        memcpy(udpBufferIndexes+udpBufferEnd, ba, 4);
+        memcpy(udpBuffer+4096*udpBufferEnd, ba+4, 4096);
+        udpBufferEnd++;
+        if(udpBufferEnd>=100)
+            udpBufferEnd=0;
+    }
+    while(udpBufferStart != udpBufferEnd)
+    {
+
+        char buf[4096];
+        memcpy(buf, udpBuffer+4096*udpBufferStart, 4096);
+        musicPlayer->play(buf);
+        udpBufferStart++;
+        if(udpBufferStart>=100)
+            udpBufferStart=0;
+    }
+}
+
+void NetThread::errorOccurred(QAbstractSocket::SocketError socketError)
+{
+    //TODO poprawić komunikaty
+    emit Error(100 + socketError,"socket error occurred");
+}
+
+void NetThread::connectToServer(QString serverName, QString serverPort, QString userName)
+{
+    this->userName = userName;
+    tcpSocket->connectToHost(serverName, serverPort.toInt());
+    connTimeoutTimer = new QTimer(this);
+    connTimeoutTimer->setSingleShot(true);
+    connect(connTimeoutTimer, &QTimer::timeout, [&]{
+        tcpSocket->abort();
+        connTimeoutTimer->deleteLater();
+        emit Error(1, "Connection time out.");
+    });
+    connTimeoutTimer->start(5000);
+}
+
+void NetThread::changeVote(QString newSongTitle)
+{
+    ;
+}
+
 void NetThread::run()
 {
-    while(!this->connected);
-    emit RoomChanged(this->roomName);
-    int bufferSize = 1000;
-    musicPlayer->setUp(100000, 2, bufferSize, 0.1, 0.1);
-    QFile sourceFile;
-    sourceFile.setFileName("D:/usunMnie/song1.wav");
-    sourceFile.open(QIODevice::ReadOnly);
-    cout << "File raport: exists "<< sourceFile.exists() << " fileSize "<< sourceFile.size() << endl;
-    emit SongChanged("D:/usunMnie/song1.wav", ((float)sourceFile.size())/100000/2);
-    char buffer[bufferSize];
-    while(!sourceFile.atEnd())
-    {
-        sourceFile.read(buffer, bufferSize);
-        musicPlayer->play(buffer);
-    }
+    while(true);
 }

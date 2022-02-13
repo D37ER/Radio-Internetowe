@@ -1,8 +1,9 @@
 #ifndef NETTHREAD_H
 #define NETTHREAD_H
 
-#include <QThread>
 #include "musicplayer.h"
+
+#include <QThread>
 #include <QFile>
 #include <iostream>
 #include <cmath>
@@ -11,6 +12,9 @@
 #include <QtCore>
 #include <QRandomGenerator>
 #include <QTime>
+#include <QTcpSocket>
+#include <QUdpSocket>
+#include <QNetworkDatagram>
 
 class NetThread : public QThread
 {
@@ -21,21 +25,41 @@ public:
     void changeVote(QString newSongTitle);
     void setMusicPlayer(MusicPlayer *playThread);
     void run();
+
 private :
+    QTcpSocket *tcpSocket;
+    QUdpSocket *udpSocket;
     MusicPlayer *musicPlayer;
-    bool connected = false;
-    QString roomName = "";
-    QVector<QString> songs;
-    QVector<int> votes;
-    QString currentVote = "";
+    QTimer *connTimeoutTimer;
+    QString userName;
+    QByteArray inputBuffer;
+    int inputBufferSize;
+    char currentInputType;
+
+    char udpBuffer[409600];
+    char udpBufferIndexes[100];
+    int udpBufferStart=0;
+    int udpBufferEnd=0;
+
+    void toStrVec(QVector<QString> *out, QByteArray *ba, int begin, int end, char delimeter);
+    void toVotes(QVector<QString> *songs, QVector<uint> *votes, QByteArray *data, int begin, int end, char delimeter);
+
+private slots:
+    void socketConnected();
+    void socketDisconnected();
+    void tcpDataReceived();
+    void udpDataReceived();
+    void errorOccurred(QAbstractSocket::SocketError);
 
 signals:
+    void ConnectionStateChanged(QString);
+    void Error(int, QString);
     void SongChanged(QString, float);
     void RoomChanged(QString);
     void SongsListChanged(QVector<QString>);
     void UsersListChanged(QVector<QString>);
     void MySongsListChanged(QVector<QString>);
-    void SongsVotesChanged(QVector<QString>, QVector<int>);
+    void SongsVotesChanged(QVector<QString>, QVector<uint>);
 };
 
 #endif // NETTHREAD_H

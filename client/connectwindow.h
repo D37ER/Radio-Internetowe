@@ -1,8 +1,9 @@
 #ifndef CONNECTWINDOW_H
 #define CONNECTWINDOW_H
 
-#include <QMainWindow>
 #include "mainwindow.h"
+
+#include <QMainWindow>
 
 namespace Ui {
 class ConnectWindow;
@@ -16,11 +17,17 @@ public:
     explicit ConnectWindow(QWidget *parent = nullptr);
     ~ConnectWindow();
 
-protected:
-    void connectToServer();
-
 private:
     Ui::ConnectWindow *ui;
+    MusicPlayer *playThread;
+    NetThread *netThread;
+    MainWindow *mw;
+
+private slots:
+    void connectToServer();
+    void changeToMainWindow();
+    void changeStatus(QString);
+    void showError(int, QString);
 };
 
 #endif // CONNECTWINDOW_H

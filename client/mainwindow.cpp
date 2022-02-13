@@ -43,7 +43,7 @@ void MainWindow::setNetThread(NetThread *netThread)
     connect(netThread, SIGNAL(SongsListChanged(QVector<QString>)), this, SLOT(onSongsListChanged(QVector<QString>)));
     connect(netThread, SIGNAL(UsersListChanged(QVector<QString>)), this, SLOT(onUsersListChanged(QVector<QString>)));
     connect(netThread, SIGNAL(MySongsListChanged(QVector<QString>)), this, SLOT(onMySongsListChanged(QVector<QString>)));
-    connect(netThread, SIGNAL(SongsVotesChanged(QVector<QString>, QVector<int>)), this, SLOT(onSongsVotesChanged(QVector<QString>, QVector<int>)));
+    connect(netThread, SIGNAL(SongsVotesChanged(QVector<QString>, QVector<uint>)), this, SLOT(onSongsVotesChanged(QVector<QString>, QVector<uint>)));
 }
 
 void MainWindow::vote(QString songTitle)
@@ -55,7 +55,7 @@ void MainWindow::vote(QString songTitle)
 
 void MainWindow::refreshVote()
 {
-    for(int i=0; i<8;i++)
+    for(int i=0; i<8 && i<songs.size(); i++)
     {
         if(this->songs[i] == this->currentVote)
             bBestSongs[i]->setStyleSheet("QToolButton { background-color: red; }");
@@ -77,14 +77,12 @@ void MainWindow::refreshVote()
 
 void MainWindow::hsVolumeChanged(int value)
 {
-    cout << (float)value/100 << endl;
     playThread->volume = (muted)? 0 : (float)value/100;
 }
 
 void MainWindow::bMuteClicked()
 {
     muted = !muted;
-    cout << muted << endl;
     playThread->volume = (muted)? 0 : (float)ui->hsVolume->value()/100;
 }
 
@@ -204,7 +202,7 @@ void MainWindow::onMySongsListChanged(QVector<QString> newMySongsList)
 
 }
 
-void MainWindow::onSongsVotesChanged(QVector<QString> songs, QVector<int> votes)
+void MainWindow::onSongsVotesChanged(QVector<QString> songs, QVector<uint> votes)
 {
     for(int i=0; i<songs.size(); i++)
     {

@@ -1,11 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <iostream>
 #include "ui_mainwindow.h"
 #include "musicplayer.h"
 #include "netthread.h"
+
+#include <QMainWindow>
+#include <iostream>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -54,7 +56,7 @@ public slots:
     void onSongsListChanged(QVector<QString>);
     void onUsersListChanged(QVector<QString>);
     void onMySongsListChanged(QVector<QString>);
-    void onSongsVotesChanged(QVector<QString>, QVector<int>);
+    void onSongsVotesChanged(QVector<QString>, QVector<uint>);
 
 };
 #endif // MAINWINDOW_H
