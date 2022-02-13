@@ -26,5 +26,10 @@ Opis projektu:
     Połączenie z użytkownikami jest monitorowane i jeżeli przez określony na serwerze czas użytkownik nie odpowiada, zostaje on usunięty z pokoju i listy użytkowników na serwerze (jego nick jest wolny).
     Jeżeli w pokoju nie ma użytkowników przez określony na serwerze czas (np. 5 minut), pokój jest usuwany. 
 
+##TODO
+- [ ] server udp - sending timer
+- [ ] sending song file info
+- [ ] vote change
+
 
 ![eventsGraph.png](https://github.com/D37ERTER/Radio-Internetowe/blob/main/eventsGraph.png?raw=true)
