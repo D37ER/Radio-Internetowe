@@ -30,6 +30,7 @@ Opis projektu:
 - [ ] server udp - sending timer
 - [ ] sending song file info
 - [ ] vote change
+- [ ] repair send songs
 
 
 ![eventsGraph.png](https://github.com/D37ERTER/Radio-Internetowe/blob/main/eventsGraph.png?raw=true)
