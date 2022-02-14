@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 {
     //GUI
     ui->setupUi(this);
+    ui->hsTime->setStyleSheet("QSlider {height: 15px;} QSlider::handle:horizontal {background-color: blue;height: 15px;}");
     ui->lwUsers->viewport()->setAutoFillBackground(false);
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
@@ -136,8 +137,7 @@ void MainWindow::lwSongsSelectionChanged()
 
 void MainWindow::onTimeChanged(float time)
 {
-    ui->pbTime->setRange(0,this->songLength*100);
-    ui->pbTime->setValue(time*100);
+    ui->hsTime->setValue(time*100);
 
     int timeInt = (int)time;
     int timeSec = timeInt%60;
@@ -158,6 +158,8 @@ void MainWindow::onSongChanged(QString newSongTitle, float newSongDuration)
 {
     ui->lSongTitle->setText(newSongTitle);
     this->songLength = newSongDuration;
+    ui->hsTime->setMinimum(0);
+    ui->hsTime->setMaximum(this->songLength*100);
 }
 
 void MainWindow::onRoomChanged(QString newRoomName)

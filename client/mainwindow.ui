@@ -298,6 +298,9 @@
              <property name="tickPosition">
               <enum>QSlider::NoTicks</enum>
              </property>
+             <property name="tickInterval">
+              <number>20</number>
+             </property>
             </widget>
            </item>
           </layout>
@@ -305,15 +308,9 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
-            <widget class="QProgressBar" name="pbTime">
+            <widget class="QSlider" name="hsTime">
              <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>20</height>
-              </size>
+              <bool>false</bool>
              </property>
              <property name="palette">
               <palette>
@@ -321,9 +318,9 @@
                 <colorrole role="WindowText">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>255</red>
-                   <green>255</green>
-                   <blue>255</blue>
+                   <red>0</red>
+                   <green>0</green>
+                   <blue>0</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -332,25 +329,25 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
                 <colorrole role="Light">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>0</red>
-                   <green>0</green>
-                   <blue>0</blue>
+                   <red>127</red>
+                   <green>127</green>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
                 <colorrole role="Midlight">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>0</red>
-                   <green>0</green>
-                   <blue>0</blue>
+                   <red>63</red>
+                   <green>63</green>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -359,7 +356,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>127</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -368,16 +365,16 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>170</blue>
                   </color>
                  </brush>
                 </colorrole>
                 <colorrole role="Text">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>255</red>
-                   <green>255</green>
-                   <blue>255</blue>
+                   <red>0</red>
+                   <green>0</green>
+                   <blue>0</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -393,18 +390,18 @@
                 <colorrole role="ButtonText">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>255</red>
-                   <green>255</green>
-                   <blue>255</blue>
+                   <red>0</red>
+                   <green>0</green>
+                   <blue>0</blue>
                   </color>
                  </brush>
                 </colorrole>
                 <colorrole role="Base">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>0</red>
-                   <green>0</green>
-                   <blue>0</blue>
+                   <red>255</red>
+                   <green>255</green>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -413,7 +410,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -429,9 +426,9 @@
                 <colorrole role="AlternateBase">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>0</red>
-                   <green>0</green>
-                   <blue>0</blue>
+                   <red>127</red>
+                   <green>127</green>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -597,7 +594,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>127</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -606,25 +603,25 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
                 <colorrole role="Light">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>0</red>
-                   <green>0</green>
-                   <blue>0</blue>
+                   <red>127</red>
+                   <green>127</green>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
                 <colorrole role="Midlight">
                  <brush brushstyle="SolidPattern">
                   <color alpha="255">
-                   <red>0</red>
-                   <green>0</green>
-                   <blue>0</blue>
+                   <red>63</red>
+                   <green>63</green>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -633,7 +630,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>127</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -642,7 +639,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>170</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -651,7 +648,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>127</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -669,7 +666,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>127</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -678,7 +675,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -687,7 +684,7 @@
                   <color alpha="255">
                    <red>0</red>
                    <green>0</green>
-                   <blue>0</blue>
+                   <blue>255</blue>
                   </color>
                  </brush>
                 </colorrole>
@@ -730,20 +727,11 @@
                </disabled>
               </palette>
              </property>
-             <property name="value">
-              <number>0</number>
+             <property name="focusPolicy">
+              <enum>Qt::NoFocus</enum>
              </property>
-             <property name="textVisible">
-              <bool>false</bool>
-             </property>
-             <property name="invertedAppearance">
-              <bool>false</bool>
-             </property>
-             <property name="textDirection">
-              <enum>QProgressBar::TopToBottom</enum>
-             </property>
-             <property name="format">
-              <string>%v s / %m s</string>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
             </widget>
            </item>

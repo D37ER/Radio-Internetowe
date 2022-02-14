@@ -24,11 +24,11 @@ Opis projektu:
     Po zakończeniu utworu z listy wybierany jest kolejny posiadający na daną chwilę najwięcej głosów, jeżeli jest takich kilka, utwór jest losowany, w skrajnym przypadku, jeżeli nikt na nic nie zagłosował, utwory odtwarzane są losowo z całej listy utworów. Po rozpoczęciu odtwarzania utworu, głosy oddane na  niego są usuwane.
 
     Połączenie z użytkownikami jest monitorowane i jeżeli przez określony na serwerze czas użytkownik nie odpowiada, zostaje on usunięty z pokoju i listy użytkowników na serwerze (jego nick jest wolny).
-    Jeżeli w pokoju nie ma użytkowników przez określony na serwerze czas (np. 5 minut), pokój jest usuwany. 
+    Jeżeli w pokoju nie ma użytkowników przez określony na serwerze czas (np. 5 minut), pokój jest usuwany.
 
 ## TODO
 - [x] server udp - sending timer
-- [ ] sending song file info
+- [x] sending song file info
 - [ ] vote change
 - [ ] repair send songs
 

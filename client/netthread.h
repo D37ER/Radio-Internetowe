@@ -37,7 +37,7 @@ private :
     char currentInputType;
 
     char udpBuffer[409600];
-    char udpBufferIndexes[100];
+    int udpBufferIndexes[100];
     int udpBufferStart=0;
     int udpBufferEnd=0;
 

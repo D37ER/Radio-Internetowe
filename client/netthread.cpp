@@ -24,7 +24,6 @@ void NetThread::setMusicPlayer(MusicPlayer *musicPlayer)
 void NetThread::socketConnected()
 {
     udpSocket->bind(QHostAddress::Any, tcpSocket->localPort());
-    musicPlayer->setUp(48000, 2, 4096, 0.1f, 0.8f);
     emit ConnectionStateChanged("connected");
     connTimeoutTimer->stop();
     connTimeoutTimer->deleteLater();
@@ -50,25 +49,25 @@ void NetThread::toStrVec(QVector<QString> *out, QByteArray *data, int begin, int
         }
 }
 
-void NetThread::toVotes(QVector<QString> *songs, QVector<uint> *votes, QByteArray *data, int begin, int end, char delimeter)
+void NetThread::toVotes(QVector<QString> *songs, QVector<uint> *votes, QByteArray *data, int begin, int end, char delimiter)
 {
     int recordStart = 0;
     uint t = 0;
     for(int i=begin; i<=end; i++)
     {
         if(i-recordStart == 0)
-            t+= (int)data->at(i);
+            t+= (unsigned char)data->at(i);
         else if(i-recordStart == 1)
-            t+= (int)data->at(i)*256;
+            t+= (unsigned char)data->at(i)*256;
         else if(i-recordStart == 2)
-            t+= (int)data->at(i)*256*256;
+            t+= (unsigned char)data->at(i)*256*256;
         else if(i-recordStart == 3)
-            t+= (int)data->at(i)*256*256*256;
-        else if(data->at(i) == delimeter || i == end)
+            t+= (unsigned char)data->at(i)*256*256*256;
+        else if(data->at(i) == delimiter || i == end)
         {
             votes->append(t);
             t = 0;
-            songs->append(QString(data->mid(recordStart+4, i-recordStart)));
+            songs->append(QString(data->mid(recordStart+4, i-recordStart-4)));
             recordStart = i+1;
         }
     }
@@ -84,10 +83,10 @@ void NetThread::tcpDataReceived()
         currentInputType = tcpSocket->read(1).at(0);
 
     inputBuffer.append(tcpSocket->readAll());
-    cout << (QString(inputBuffer)).toStdString() << endl;
+
     for(; inputBufferSize<inputBuffer.size(); inputBufferSize++)
     {
-        if(inputBuffer.at(inputBufferSize) == '\n')
+        if(inputBuffer.at(inputBufferSize) == '\n' && (currentInputType != 'f' || inputBufferSize > 12))
         {
             switch(currentInputType)
             {
@@ -126,9 +125,17 @@ void NetThread::tcpDataReceived()
             }
             case 'f':
             {
-                float length=0;
-                memcpy(&length, inputBuffer, sizeof(length));
-                emit SongChanged(QString(inputBuffer.mid(sizeof(length), inputBufferSize-sizeof(length))), length);
+                char data[12];
+                memcpy(data, inputBuffer, 12);
+                int sampleCount = 0;
+                memcpy(&sampleCount, data, 4);
+                int sampleRate = 0;
+                memcpy(&sampleRate, data + 4, 4);
+                int packSize = 0;
+                memcpy(&packSize, data + 8, 4);
+                QString name = QString(inputBuffer.mid(8, inputBufferSize-8));
+                emit SongChanged(name, (float)(sampleCount)/sampleRate);
+                musicPlayer->setUp(sampleRate, 2, packSize, 0.1f, 0.8f);
                 break;
             }
             default:
