@@ -27,7 +27,7 @@ Opis projektu:
     Jeżeli w pokoju nie ma użytkowników przez określony na serwerze czas (np. 5 minut), pokój jest usuwany. 
 
 ## TODO
-- [ ] server udp - sending timer
+- [x] server udp - sending timer
 - [ ] sending song file info
 - [ ] vote change
 - [ ] repair send songs
