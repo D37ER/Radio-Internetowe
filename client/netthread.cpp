@@ -53,24 +53,25 @@ void NetThread::toStrVec(QVector<QString> *out, QByteArray *data, int begin, int
 void NetThread::toVotes(QVector<QString> *songs, QVector<uint> *votes, QByteArray *data, int begin, int end, char delimeter)
 {
     int recordStart = 0;
-    uint t;
+    uint t = 0;
     for(int i=begin; i<=end; i++)
-        if(data->at(i) == delimeter || i == end)
+    {
+        if(i-recordStart == 0)
+            t+= (int)data->at(i);
+        else if(i-recordStart == 1)
+            t+= (int)data->at(i)*256;
+        else if(i-recordStart == 2)
+            t+= (int)data->at(i)*256*256;
+        else if(i-recordStart == 3)
+            t+= (int)data->at(i)*256*256*256;
+        else if(data->at(i) == delimeter || i == end)
         {
-            if(i-recordStart < 5)
-            {
-                recordStart = i+1;
-                continue;
-            }
-            t=0;
-            t+= ((int)data->at(recordStart++));
-            t+= ((int)data->at(recordStart++))*256;
-            t+= ((int)data->at(recordStart++))*65536;
-            t+= ((int)data->at(recordStart++))*16777216;
             votes->append(t);
-            songs->append(QString(data->mid(recordStart, i-recordStart)));
+            t = 0;
+            songs->append(QString(data->mid(recordStart+4, i-recordStart)));
             recordStart = i+1;
         }
+    }
 }
 
 void NetThread::tcpDataReceived()
@@ -86,10 +87,8 @@ void NetThread::tcpDataReceived()
     cout << (QString(inputBuffer)).toStdString() << endl;
     for(; inputBufferSize<inputBuffer.size(); inputBufferSize++)
     {
-        cout << "adding buffer " << endl;
         if(inputBuffer.at(inputBufferSize) == '\n')
         {
-            cout << "enter " << endl;
             switch(currentInputType)
             {
             case 'a':
