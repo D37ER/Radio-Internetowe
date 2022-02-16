@@ -30,6 +30,7 @@ Opis projektu:
 - [x] server udp - sending timer
 - [x] sending song file info
 - [X] vote change
+- [ ] returing vote - gui
 - [ ] repair send songs list - gui
 - [ ] user names validation
 - [ ] sending songs -gui
