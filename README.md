@@ -35,7 +35,8 @@ Opis projektu:
 - [ ] sending songs -gui
 - [ ] sending songs -client
 - [ ] sending songs -server
-- [ ] mutexy
-- [ ] przycisk mute - gui
+- [ ] mutexes
+- [ ] better mute button
+- [ ] change from room to server -code clean up
 
 ![eventsGraph.png](https://github.com/D37ERTER/Radio-Internetowe/blob/main/eventsGraph.png?raw=true)
