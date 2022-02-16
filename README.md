@@ -40,7 +40,6 @@ Opis projektu:
 - [x] sending song file info
 - [X] vote change
 - [ ] user names validation
-- [ ] sending songs -gui
 - [ ] sending songs -server
 - [ ] mutexes
 
