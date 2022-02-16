@@ -29,8 +29,12 @@ Opis projektu:
 ## TODO
 - [x] server udp - sending timer
 - [x] sending song file info
-- [ ] vote change
-- [ ] repair send songs
-
+- [X] vote change
+- [ ] repair send songs list - gui
+- [ ] user names validation
+- [ ] sending songs -gui
+- [ ] sending songs -client
+- [ ] sending songs -server
+- [ ] mutexy
 
 ![eventsGraph.png](https://github.com/D37ERTER/Radio-Internetowe/blob/main/eventsGraph.png?raw=true)
