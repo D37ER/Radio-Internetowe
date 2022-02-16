@@ -34,6 +34,7 @@ private :
     QString userName;
     QByteArray inputBuffer;
     int inputBufferSize;
+    int inputBufferlast0;
     char currentInputType;
 
     char udpBuffer[409600];

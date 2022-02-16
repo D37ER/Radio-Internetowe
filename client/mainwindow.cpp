@@ -160,6 +160,12 @@ void MainWindow::onSongChanged(QString newSongTitle, float newSongDuration)
     this->songLength = newSongDuration;
     ui->hsTime->setMinimum(0);
     ui->hsTime->setMaximum(this->songLength*100);
+    if(this->currentVote == newSongTitle)
+    {
+        currentVote = "";
+        refreshVote();
+    }
+
 }
 
 void MainWindow::onRoomChanged(QString newRoomName)

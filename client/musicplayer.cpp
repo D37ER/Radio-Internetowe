@@ -27,15 +27,15 @@ void MusicPlayer::setUp(int sampleRate, int sampleSize, int playBufferSize, floa
     this->position = 0;
 
     this->dev = audio->start();
+    setuped = true;
 }
 
-void MusicPlayer::play(char *buffer)
+void MusicPlayer::play(char *buffer, int position)
 {
     //pause
     while(this->pause);
 
     //emit time
-    position++;
     if(position%timeUpdateDistance==0)
         emit TimeChanged(position*positionToSecondsMultiplayer);
 
@@ -49,6 +49,7 @@ void MusicPlayer::play(char *buffer)
     }
 
     //send data to speaker
-    while(audio->bytesFree()-devBufferUnusedSpace < playBufferSize);
+    if(audio->bytesFree()-devBufferUnusedSpace < playBufferSize)
+        return;
     dev->write(buffer, playBufferSize);
 }

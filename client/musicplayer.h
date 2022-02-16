@@ -17,9 +17,10 @@ class MusicPlayer : public QObject
 public:
     explicit MusicPlayer();
     void setUp(int sampleRate, int sampleSize, int playBufferSize, float timeUpdateRate, float deviceBufferUsage);
-    void play(char *buffer);
+    void play(char *buffer, int position);
     bool pause = false;
     float volume = 1;
+    bool setuped = false;
 
 private:
     int sampleSize;

@@ -4,6 +4,7 @@ using namespace std;
 NetThread::NetThread(QObject *parent): QThread{parent}
 {
     inputBufferSize = 0;
+    inputBufferlast0 = 0;
     currentInputType = '\0';
     tcpSocket = new QTcpSocket(this);
     connect(tcpSocket, &QTcpSocket::connected, this, &NetThread::socketConnected);
@@ -75,7 +76,6 @@ void NetThread::toVotes(QVector<QString> *songs, QVector<uint> *votes, QByteArra
 
 void NetThread::tcpDataReceived()
 {
-    cout << "dataReceived " << tcpSocket->bytesAvailable() << endl;
     if(tcpSocket->bytesAvailable() <1)
         return;
 
@@ -84,9 +84,12 @@ void NetThread::tcpDataReceived()
 
     inputBuffer.append(tcpSocket->readAll());
 
+
     for(; inputBufferSize<inputBuffer.size(); inputBufferSize++)
     {
-        if(inputBuffer.at(inputBufferSize) == '\n' && (currentInputType != 'f' || inputBufferSize > 12))
+        if(currentInputType == 'e' && inputBufferSize-inputBufferlast0 > 4 && inputBuffer.at(inputBufferSize) == '\0')
+            inputBufferlast0 = inputBufferSize;
+        else if(inputBuffer.at(inputBufferSize) == '\n' && (currentInputType != 'f' || inputBufferSize > 12) && (currentInputType != 'e' || inputBufferSize-inputBufferlast0 > 4))
         {
             switch(currentInputType)
             {
@@ -145,6 +148,7 @@ void NetThread::tcpDataReceived()
             if(inputBufferSize+1 < inputBuffer.size())
             {
                 currentInputType = inputBuffer.at(inputBufferSize+1);
+                inputBufferlast0 = 0;
                 inputBuffer.remove(0,inputBufferSize+2);
             }
             else
@@ -152,7 +156,7 @@ void NetThread::tcpDataReceived()
                 currentInputType = '\0';
                 inputBuffer.remove(0,inputBufferSize+1);
             }
-            inputBufferSize = 0;
+            inputBufferSize = -1;
         }
     }
 }
@@ -160,6 +164,7 @@ void NetThread::tcpDataReceived()
 void NetThread::udpDataReceived()
 {
     QByteArray ba;
+
     while(udpSocket->hasPendingDatagrams())
     {
         ba = udpSocket->receiveDatagram().data();
@@ -174,7 +179,8 @@ void NetThread::udpDataReceived()
 
         char buf[4096];
         memcpy(buf, udpBuffer+4096*udpBufferStart, 4096);
-        musicPlayer->play(buf);
+        if(musicPlayer->setuped)
+            musicPlayer->play(buf, udpBufferIndexes[udpBufferStart]);
         udpBufferStart++;
         if(udpBufferStart>=100)
             udpBufferStart=0;
@@ -203,7 +209,9 @@ void NetThread::connectToServer(QString serverName, QString serverPort, QString 
 
 void NetThread::changeVote(QString newSongTitle)
 {
-    ;
+    QByteArray ba = newSongTitle.toLocal8Bit();
+    tcpSocket->write(ba.data());
+    tcpSocket->write("\n");
 }
 
 void NetThread::run()
