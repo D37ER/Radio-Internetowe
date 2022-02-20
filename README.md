@@ -27,19 +27,19 @@ Opis projektu:
     Jeżeli w pokoju nie ma użytkowników przez określony na serwerze czas (np. 5 minut), pokój jest usuwany.
 
 ## TODO clinet
-- [ ] returing vote - gui
+- [X] returing vote - gui
 - [ ] repair send songs list - gui
-- [ ] user names validation
-- [ ] sending songs -gui
+- [X] user names validation
+- [X] sending songs -gui
 - [ ] sending songs -client
 - [ ] better mute button
-- [ ] change from room to server -code clean up
+- [X] change from room to server -code clean up
 
 ## TODO server
 - [x] server udp - sending timer
 - [x] sending song file info
 - [X] vote change
-- [ ] user names validation
+- [X] user names validation
 - [ ] sending songs -server
 - [ ] mutexes
 
