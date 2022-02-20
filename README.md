@@ -28,11 +28,11 @@ Opis projektu:
 
 ## TODO clinet
 - [X] returing vote - gui
-- [ ] repair send songs list - gui
+- [X] repair send songs list - gui
 - [X] user names validation
 - [X] sending songs -gui
 - [ ] sending songs -client
-- [ ] better mute button
+- [X] better mute button
 - [X] change from room to server -code clean up
 
 ## TODO server
