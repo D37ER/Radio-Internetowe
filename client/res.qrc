@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>muted.png</file>
+        <file>unmuted.png</file>
+    </qresource>
+</RCC>

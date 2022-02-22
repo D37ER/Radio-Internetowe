@@ -28,13 +28,14 @@ private:
     int devBufferUnusedSpace;
     int timeUpdateDistance;
     float positionToSecondsMultiplayer;
-    int position;
     QAudioSink* audio;
     QIODevice* dev;
 
+public slots:
+    void onChangeVolume(float);
+
 signals:
     void TimeChanged(float);
-
 };
 
 #endif // MUSICPLAYER_H

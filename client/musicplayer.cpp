@@ -24,10 +24,9 @@ void MusicPlayer::setUp(int sampleRate, int sampleSize, int playBufferSize, floa
     this->timeUpdateDistance = sampleSize*sampleRate/playBufferSize*timeUpdateRate;
     this->positionToSecondsMultiplayer = ((float)playBufferSize)/sampleSize/sampleRate;
     this->devBufferUnusedSpace = audio->bufferSize() *(1-deviceBufferUsage);
-    this->position = 0;
 
     this->dev = audio->start();
-    setuped = true;
+    this->setuped = true;
 }
 
 void MusicPlayer::play(char *buffer, int position)
@@ -52,4 +51,9 @@ void MusicPlayer::play(char *buffer, int position)
     if(audio->bytesFree()-devBufferUnusedSpace < playBufferSize)
         return;
     dev->write(buffer, playBufferSize);
+}
+
+void MusicPlayer::onChangeVolume(float volume)
+{
+    this->volume = volume;
 }

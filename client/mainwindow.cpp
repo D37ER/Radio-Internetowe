@@ -3,12 +3,19 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
-    //GUI
     ui->setupUi(this);
-    ui->hsTime->setStyleSheet("QSlider {height: 15px;} QSlider::handle:horizontal {background-color: blue;height: 15px;}");
+    ui->hsTime->setStyleSheet("QSlider {height:10px;} .QSlider::handle:horizontal {background-color:blue;border-radius: 5px;}");
     ui->lwUsers->viewport()->setAutoFillBackground(false);
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
+
+    QPixmap pixmap1(":/unmuted.png");
+    unmuttedIcon = new QIcon(pixmap1);
+    QPixmap pixmap2(":/muted.png");
+    muttedIcon = new QIcon(pixmap2);
+    ui->bMute->setIcon(*unmuttedIcon);
+    ui->bMute->setIconSize(pixmap1.rect().size());
+
     bBestSongs[0] = ui->bBestSong1;
     bBestSongs[1] = ui->bBestSong2;
     bBestSongs[2] = ui->bBestSong3;
@@ -17,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     bBestSongs[5] = ui->bBestSong6;
     bBestSongs[6] = ui->bBestSong7;
     bBestSongs[7] = ui->bBestSong8;
+    connect(ui->bChangeServer, &QPushButton::clicked, this, &MainWindow::bChangeServerClicked);
     connect(ui->hsVolume, &QSlider::valueChanged, this, &MainWindow::hsVolumeChanged);
     connect(ui->bMute, &QPushButton::clicked, this, &MainWindow::bMuteClicked);
     connect(ui->bBestSong1, &QPushButton::clicked, this, &MainWindow::bBestSong1Clicked);
@@ -30,36 +38,24 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->lwSongs, &QListWidget::itemActivated, this, &MainWindow::lwSongsSelectionChanged);
 }
 
-void MainWindow::setPlayThread(MusicPlayer *playThread)
+MainWindow::~MainWindow()
 {
-    this->playThread = playThread;
-    connect(playThread, SIGNAL(TimeChanged(float)), this, SLOT(onTimeChanged(float)));
-}
-
-void MainWindow::setNetThread(NetThread *netThread)
-{
-    this->netThread = netThread;
-    connect(netThread, SIGNAL(SongChanged(QString, float)), this, SLOT(onSongChanged(QString, float)));
-    connect(netThread, SIGNAL(RoomChanged(QString)), this, SLOT(onRoomChanged(QString)));
-    connect(netThread, SIGNAL(SongsListChanged(QVector<QString>)), this, SLOT(onSongsListChanged(QVector<QString>)));
-    connect(netThread, SIGNAL(UsersListChanged(QVector<QString>)), this, SLOT(onUsersListChanged(QVector<QString>)));
-    connect(netThread, SIGNAL(MySongsListChanged(QVector<QString>)), this, SLOT(onMySongsListChanged(QVector<QString>)));
-    connect(netThread, SIGNAL(SongsVotesChanged(QVector<QString>, QVector<uint>)), this, SLOT(onSongsVotesChanged(QVector<QString>, QVector<uint>)));
+    delete ui;
 }
 
 void MainWindow::vote(QString songTitle)
 {
     this->currentVote = songTitle;
-    refreshVote();
-    netThread->changeVote(songTitle);
+    refreshVoteGUI();
+    emit ChangeVote(songTitle);
 }
 
-void MainWindow::refreshVote()
+void MainWindow::refreshVoteGUI()
 {
     for(int i=0; i<8 && i<songs.size(); i++)
     {
         if(this->songs[i] == this->currentVote)
-            bBestSongs[i]->setStyleSheet("QToolButton { background-color: red; }");
+            bBestSongs[i]->setStyleSheet("QToolButton { background-color: #A0A0FF; }");
         else
             bBestSongs[i]->setStyleSheet("");
     }
@@ -68,23 +64,31 @@ void MainWindow::refreshVote()
     for(int i=0; i<ui->lwSongs->count();i++)
     {
         if(this->songs[i] == this->currentVote)
-            ui->lwSongs->item(i)->setBackground(Qt::red);
+            ui->lwSongs->item(i)->setBackground(QColor(160, 160, 255));
         else
             ui->lwSongs->item(i)->setBackground(Qt::white);
     }
 }
 
-//GUI
+//GUI slots
+void MainWindow::bChangeServerClicked()
+{
+    emit showConnectWindow();
+}
 
 void MainWindow::hsVolumeChanged(int value)
 {
-    playThread->volume = (muted)? 0 : (float)value/100;
+    emit ChangeVolume((muted)? 0 : (float)value/100);
 }
 
 void MainWindow::bMuteClicked()
 {
     muted = !muted;
-    playThread->volume = (muted)? 0 : (float)ui->hsVolume->value()/100;
+    if(muted)
+        ui->bMute->setIcon(*muttedIcon);
+    else
+        ui->bMute->setIcon(*unmuttedIcon);
+    emit ChangeVolume((muted)? 0 : (float)ui->hsVolume->value()/100);
 }
 
 void MainWindow::bBestSong1Clicked()
@@ -117,7 +121,6 @@ void MainWindow::bBestSong6Clicked()
     vote(this->songs[5]);
 }
 
-
 void MainWindow::bBestSong7Clicked()
 {
     vote(this->songs[6]);
@@ -133,7 +136,17 @@ void MainWindow::lwSongsSelectionChanged()
     vote(this->songs[ui->lwSongs->row(ui->lwSongs->selectedItems()[0])]);
 }
 
+
 //SLOTS
+void MainWindow::onHide()
+{
+    hide();
+}
+
+void MainWindow::onShow()
+{
+    show();
+}
 
 void MainWindow::onTimeChanged(float time)
 {
@@ -162,15 +175,24 @@ void MainWindow::onSongChanged(QString newSongTitle, float newSongDuration)
     ui->hsTime->setMaximum(this->songLength*100);
     if(this->currentVote == newSongTitle)
     {
-        currentVote = "";
-        refreshVote();
+        this->currentVote = "";
+        refreshVoteGUI();
     }
 
 }
 
-void MainWindow::onRoomChanged(QString newRoomName)
+void MainWindow::onServerNameChanged(QString newServerName)
 {
-    ui->lRoomName->setText(newRoomName);
+    ui->lRoomName->setText(newServerName);
+}
+
+QString MainWindow::addNewLines(QString text, int maxWidth)
+{
+    for(int i=maxWidth; i<text.length(); i+=maxWidth)
+    {
+        text.insert(i, '\n');
+    }
+    return text;
 }
 
 void MainWindow::onSongsListChanged(QVector<QString> newSongsList)
@@ -182,33 +204,24 @@ void MainWindow::onSongsListChanged(QVector<QString> newSongsList)
     ui->lwSongs->clear();
     for(int i=0;i<this->songs.size();i++)
     {
-        ui->lwSongs->addItem(this->songs[i]);
+        ui->lwSongs->addItem(songs[i] + " (- votes)");
     }
     for(int i=0; i<8&&i<this->songs.size();i++)
     {
         bBestSongs[i]->setEnabled(true);
-        bBestSongs[i]->setText(this->songs[i]);
+        bBestSongs[i]->setText(addNewLines(songs[i], 18) + "\n- votes");
     }
     for(int i=this->songs.size(); i<8;i++)
         bBestSongs[i]->setEnabled(false);
-
-    //TODO nie działa z onSongsVotesChanged - poprawić
 }
 
 void MainWindow::onUsersListChanged(QVector<QString> newUsersList)
 {
     ui->lwUsers->clear();
     for(int i=0;i<newUsersList.size();i++)
-    {
-        cout << "user "  << newUsersList[i].toStdString() << endl;
         ui->lwUsers->addItem(newUsersList[i]);
-    }
 }
 
-void MainWindow::onMySongsListChanged(QVector<QString> newMySongsList)
-{
-
-}
 
 void MainWindow::onSongsVotesChanged(QVector<QString> songs, QVector<uint> votes)
 {
@@ -217,14 +230,10 @@ void MainWindow::onSongsVotesChanged(QVector<QString> songs, QVector<uint> votes
         if(this->songs[i] != songs[i])
             this->songs[i] = songs[i];
         if(i<8)
-            bBestSongs[i]->setText(songs[i] + "\n" +  QString::number(votes[i]) + " votes");
+            bBestSongs[i]->setText(addNewLines(songs[i], 18) + "\n" +  QString::number(votes[i]) + " votes");
         ui->lwSongs->item(i)->setText(songs[i] + " (" +  QString::number(votes[i]) + " votes)");
     }
-    refreshVote();
+    refreshVoteGUI();
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
 

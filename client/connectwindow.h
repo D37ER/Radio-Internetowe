@@ -23,11 +23,17 @@ private:
     NetThread *netThread;
     MainWindow *mw;
 
+public slots:
+    void onChangeStatus(QString);
+    void onShowError(int, QString);
+    void onHide();
+    void onShow();
+
 private slots:
-    void connectToServer();
-    void changeToMainWindow();
-    void changeStatus(QString);
-    void showError(int, QString);
+    void connectPressed();
+
+signals:
+    void ConnectToServer(QString, QString, QString);
 };
 
 #endif // CONNECTWINDOW_H
